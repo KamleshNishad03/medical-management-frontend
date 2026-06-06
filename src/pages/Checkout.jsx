@@ -796,8 +796,66 @@ const Checkout = () => {
     await reverseGeocode(lat, lng);
   };
 
-  // ================= CURRENT LOCATION =================
- const handleUseCurrentLocation = () => {
+//   // ================= CURRENT LOCATION =================
+//  const handleUseCurrentLocation = () => {
+//   if (!navigator.geolocation) {
+//     alert("Geolocation is not supported");
+//     return;
+//   }
+
+//   setGettingLocation(true);
+
+//   const watchId = navigator.geolocation.watchPosition(
+//     async (position) => {
+//       const lat = position.coords.latitude;
+//       const lng = position.coords.longitude;
+
+//       console.log("LIVE LOCATION:", lat, lng);
+
+//       // stop watching after getting latest location
+//       navigator.geolocation.clearWatch(watchId);
+
+//       setForm((prev) => ({
+//         ...prev,
+//         location: {
+//           lat: lat.toString(),
+//           lng: lng.toString(),
+//         },
+//       }));
+
+//       await reverseGeocode(lat, lng);
+
+//       setGettingLocation(false);
+
+//       alert("Current location updated");
+//     },
+
+//     (error) => {
+//       console.error(error);
+
+//       setGettingLocation(false);
+
+//       if (error.code === 1) {
+//         alert("Location permission denied");
+//       } else if (error.code === 2) {
+//         alert("Location unavailable");
+//       } else if (error.code === 3) {
+//         alert("Location timeout");
+//       } else {
+//         alert("Failed to get location");
+//       }
+//     },
+
+//     {
+//       enableHighAccuracy: true,
+//       timeout: 20000,
+//       maximumAge: 0,
+//     }
+//   );
+// };
+
+
+const handleUseCurrentLocation = () => {
   if (!navigator.geolocation) {
     alert("Geolocation is not supported");
     return;
@@ -805,15 +863,14 @@ const Checkout = () => {
 
   setGettingLocation(true);
 
-  const watchId = navigator.geolocation.watchPosition(
+  navigator.geolocation.getCurrentPosition(
     async (position) => {
       const lat = position.coords.latitude;
       const lng = position.coords.longitude;
 
-      console.log("LIVE LOCATION:", lat, lng);
-
-      // stop watching after getting latest location
-      navigator.geolocation.clearWatch(watchId);
+      console.log("LAT:", lat);
+      console.log("LNG:", lng);
+      console.log("ACCURACY (meters):", position.coords.accuracy);
 
       setForm((prev) => ({
         ...prev,
@@ -824,28 +881,16 @@ const Checkout = () => {
       }));
 
       await reverseGeocode(lat, lng);
-
       setGettingLocation(false);
-
-      alert("Current location updated");
+      alert("Location updated");
     },
-
     (error) => {
-      console.error(error);
-
       setGettingLocation(false);
-
-      if (error.code === 1) {
-        alert("Location permission denied");
-      } else if (error.code === 2) {
-        alert("Location unavailable");
-      } else if (error.code === 3) {
-        alert("Location timeout");
-      } else {
-        alert("Failed to get location");
-      }
+      if (error.code === 1) alert("Location permission denied");
+      else if (error.code === 2) alert("Location unavailable");
+      else if (error.code === 3) alert("Location timeout");
+      else alert("Failed to get location");
     },
-
     {
       enableHighAccuracy: true,
       timeout: 20000,
