@@ -931,7 +931,7 @@ const Home = ({ openLoginModal }) => {
                   icon: "📍",
                   label: "Address",
                   value:
-                    "123, ApnaCare Medical Center, Chauri Chaura, Gorakhpur, Uttar Pradesh - 211001",
+                    "123, ApnaCare Medical Center, Chauri Chaura, Gorakhpur, Uttar Pradesh - 273201",
                 },
                 {
                   icon: "📞",
