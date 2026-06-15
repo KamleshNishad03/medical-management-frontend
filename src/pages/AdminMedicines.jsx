@@ -1,16 +1,15 @@
 
 
+
 // import { useEffect, useState } from "react";
 // import api from "../api/api";
-
-// const BASE_URL = "http://localhost:5000";
 
 // const emptyForm = {
 //   name: "",
 //   type: "",
 //   category: "",
 //   brand: "",
-//   price: "",
+//   mrp: "",
 //   stock: "",
 //   description: "",
 //   expiryDate: "",
@@ -21,11 +20,9 @@
 // const AdminMedicines = () => {
 //   const [medicines, setMedicines] = useState([]);
 //   const [search, setSearch] = useState("");
-
 //   const [form, setForm] = useState(emptyForm);
 //   const [images, setImages] = useState([null]);
 //   const [preview, setPreview] = useState([null]);
-
 //   const [showModal, setShowModal] = useState(false);
 //   const [editing, setEditing] = useState(null);
 
@@ -52,6 +49,7 @@
 
 //   const handleChange = (e) => {
 //     const { name, value, type, checked } = e.target;
+
 //     setForm((prev) => ({
 //       ...prev,
 //       [name]: type === "checkbox" ? checked : value,
@@ -60,6 +58,7 @@
 
 //   const handleImageChange = (e, index) => {
 //     const file = e.target.files[0];
+
 //     if (!file) return;
 
 //     const newImages = [...images];
@@ -71,12 +70,9 @@
 //     setPreview(newPreviews);
 //   };
 
-//   // const addImageSlot = () => {
-//   //   setImages((prev) => [...prev, null]);
-//   //   setPreview((prev) => [...prev, null]);
-//   // };
 //   const addImageSlot = () => {
 //     if (images.length >= 3) return;
+
 //     setImages((prev) => [...prev, null]);
 //     setPreview((prev) => [...prev, null]);
 //   };
@@ -87,9 +83,9 @@
 //   };
 
 //   const discountedPrice =
-//     form.price && form.offer
-//       ? Math.round(form.price - (form.price * form.offer) / 100)
-//       : form.price;
+//     form.mrp && form.offer
+//       ? Math.round(form.mrp - (form.mrp * form.offer) / 100)
+//       : form.mrp;
 
 //   const handleSubmit = async (e) => {
 //     e.preventDefault();
@@ -102,14 +98,18 @@
 //       });
 
 //       images.forEach((img) => {
-//         if (img) formData.append("images", img);
+//         if (img) {
+//           formData.append("images", img);
+//         }
 //       });
 
 //       if (editing) {
 //         await api.put(`/medicines/update/${editing._id}`, formData);
+
 //         alert("Updated successfully");
 //       } else {
 //         await api.post("/medicines/create", formData);
+
 //         alert("Medicine added successfully");
 //       }
 
@@ -122,26 +122,31 @@
 
 //   const handleEdit = (m) => {
 //     setEditing(m);
+
 //     setForm({
 //       name: m.name || "",
 //       type: m.type || "",
 //       category: m.category || "",
 //       brand: m.brand || "",
-//       price: m.price || "",
+//       mrp: m.mrp || "",
 //       stock: m.stock || "",
 //       description: m.description || "",
 //       expiryDate: m.expiryDate?.slice(0, 10) || "",
 //       prescriptionRequired: m.prescriptionRequired || false,
 //       offer: m.offer || "",
 //     });
+
 //     setImages([null]);
 //     setPreview([null]);
+
 //     setShowModal(true);
 //   };
 
 //   const handleDelete = async (id) => {
 //     if (!window.confirm("Delete this medicine?")) return;
+
 //     await api.delete(`/medicines/delete/${id}`);
+
 //     fetchMedicines();
 //   };
 
@@ -149,6 +154,7 @@
 //     <div>
 //       <div className="flex justify-between mb-5">
 //         <h1 className="text-2xl font-bold">Manage Medicines</h1>
+
 //         <button
 //           onClick={() => setShowModal(true)}
 //           className="bg-green-600 text-white px-4 py-2 rounded-lg"
@@ -166,22 +172,34 @@
 
 //       <div className="grid grid-cols-2 md:grid-cols-3 gap-4">
 //         {medicines.map((m) => {
-//           const originalPrice = m.offer
-//             ? Math.round(m.price / (1 - m.offer / 100))
-//             : m.price;
+//           const discounted = m.offer
+//             ? Math.round(m.mrp - (m.mrp * m.offer) / 100)
+//             : null;
 
 //           return (
 //             <div
 //               key={m._id}
 //               className="bg-white p-3 rounded-xl shadow hover:shadow-xl transition"
 //             >
-//               {m.images?.length > 0 && (
-//                 <img
-//                   src={`${BASE_URL}/${m.images[0].replace(/\\/g, "/")}`}
-//                   alt={m.name}
-//                   className="h-32 w-full object-cover rounded"
-//                 />
-//               )}
+//               <div className="relative">
+//                 {m.images?.length > 0 && (
+//                   <img
+//                     src={m.images[0]}
+//                     alt={m.name}
+//                     className="h-32 w-full object-cover rounded"
+//                     onError={(e) => {
+//                       e.target.src =
+//                         "https://via.placeholder.com/300x200?text=No+Image";
+//                     }}
+//                   />
+//                 )}
+
+//                 {m.offer ? (
+//                   <div className="absolute top-2 right-2 bg-orange-500 text-white text-xs px-2 py-0.5 rounded-full font-bold">
+//                     {m.offer}% OFF
+//                   </div>
+//                 ) : null}
+//               </div>
 
 //               <h2 className="font-bold mt-2">{m.name}</h2>
 
@@ -189,15 +207,21 @@
 //                 {m.offer ? (
 //                   <>
 //                     <span className="text-gray-400 line-through text-sm">
-//                       ₹{originalPrice}
+//                       ₹{m.mrp}
 //                     </span>
-//                     <span className="text-green-600 font-bold">₹{m.price}</span>
-//                     <span className="text-xs bg-green-100 text-green-700 px-2 rounded">
+
+//                     <span className="text-green-600 font-bold">
+//                       ₹{discounted}
+//                     </span>
+
+//                     <span className="text-xs bg-orange-100 text-orange-600 px-2 py-0.5 rounded-full">
 //                       {m.offer}% OFF
 //                     </span>
 //                   </>
 //                 ) : (
-//                   <span className="text-green-600 font-bold">₹{m.price}</span>
+//                   <span className="text-green-600 font-bold">
+//                     ₹{m.mrp}
+//                   </span>
 //                 )}
 //               </div>
 
@@ -208,6 +232,7 @@
 //                 >
 //                   Edit
 //                 </button>
+
 //                 <button
 //                   onClick={() => handleDelete(m._id)}
 //                   className="bg-red-500 text-white px-3 py-1 rounded"
@@ -241,6 +266,7 @@
 //                 onChange={handleChange}
 //                 className="border p-2 w-full rounded"
 //               />
+
 //               <input
 //                 name="type"
 //                 placeholder="Type"
@@ -248,6 +274,7 @@
 //                 onChange={handleChange}
 //                 className="border p-2 w-full rounded"
 //               />
+
 //               <input
 //                 name="category"
 //                 placeholder="Category"
@@ -255,6 +282,7 @@
 //                 onChange={handleChange}
 //                 className="border p-2 w-full rounded"
 //               />
+
 //               <input
 //                 name="brand"
 //                 placeholder="Brand"
@@ -265,13 +293,14 @@
 
 //               <div className="grid grid-cols-2 gap-2">
 //                 <input
-//                   name="price"
+//                   name="mrp"
 //                   type="number"
-//                   placeholder="Price"
-//                   value={form.price}
+//                   placeholder="MRP"
+//                   value={form.mrp}
 //                   onChange={handleChange}
 //                   className="border p-2 rounded"
 //                 />
+
 //                 <input
 //                   name="offer"
 //                   type="number"
@@ -282,15 +311,19 @@
 //                 />
 //               </div>
 
-//               {form.price && form.offer && (
-//                 <div className="text-sm">
-//                   <span className="line-through text-gray-400 mr-2">
-//                     ₹{form.price}
+//               {form.mrp && form.offer && (
+//                 <div className="text-sm bg-orange-50 p-2 rounded flex items-center gap-2">
+//                   <span className="line-through text-gray-400">
+//                     ₹{form.mrp}
 //                   </span>
-//                   <span className="text-green-600 font-bold mr-2">
+
+//                   <span className="text-green-600 font-bold">
 //                     ₹{discountedPrice}
 //                   </span>
-//                   <span className="text-red-500">{form.offer}% OFF</span>
+
+//                   <span className="text-orange-500 font-semibold">
+//                     {form.offer}% OFF
+//                   </span>
 //                 </div>
 //               )}
 
@@ -302,6 +335,7 @@
 //                 onChange={handleChange}
 //                 className="border p-2 w-full rounded"
 //               />
+
 //               <input
 //                 name="expiryDate"
 //                 type="date"
@@ -309,6 +343,7 @@
 //                 onChange={handleChange}
 //                 className="border p-2 w-full rounded"
 //               />
+
 //               <textarea
 //                 name="description"
 //                 placeholder="Description"
@@ -325,10 +360,10 @@
 //                   checked={form.prescriptionRequired}
 //                   onChange={handleChange}
 //                 />
+
 //                 Prescription Required
 //               </label>
 
-//               {/* Images Section */}
 //               <div className="space-y-2">
 //                 <label className="text-sm font-semibold text-gray-700">
 //                   Images
@@ -342,6 +377,7 @@
 //                       onChange={(e) => handleImageChange(e, index)}
 //                       className="border p-2 w-full rounded text-sm"
 //                     />
+
 //                     {src && (
 //                       <img
 //                         src={src}
@@ -349,6 +385,7 @@
 //                         className="w-12 h-12 object-cover rounded flex-shrink-0"
 //                       />
 //                     )}
+
 //                     <button
 //                       type="button"
 //                       onClick={() => removeImageSlot(index)}
@@ -358,14 +395,6 @@
 //                     </button>
 //                   </div>
 //                 ))}
-
-//                 {/* <button
-//                   type="button"
-//                   onClick={addImageSlot}
-//                   className="text-green-600 font-semibold text-sm"
-//                 >
-//                   + Add More Image
-//                 </button> */}
 
 //                 <button
 //                   type="button"
@@ -411,6 +440,33 @@ const emptyForm = {
   offer: "",
 };
 
+const MEDICINE_TYPES = [
+  "Tablet",
+  "Syrup",
+  "Capsule",
+  "Injection",
+  "Cream",
+  "Drops",
+  "Powder",
+  "Gel",
+  "Inhaler",
+];
+
+const MEDICINE_CATEGORIES = [
+  "Antibiotic",
+  "Painkiller",
+  "Vitamin",
+  "Antacid",
+  "Antifungal",
+  "Diabetes",
+  "BP",
+  "Skin Care",
+  "Eye Care",
+  "Digestive",
+  "Cold & Flu",
+  "Other",
+];
+
 const AdminMedicines = () => {
   const [medicines, setMedicines] = useState([]);
   const [search, setSearch] = useState("");
@@ -443,7 +499,6 @@ const AdminMedicines = () => {
 
   const handleChange = (e) => {
     const { name, value, type, checked } = e.target;
-
     setForm((prev) => ({
       ...prev,
       [name]: type === "checkbox" ? checked : value,
@@ -452,7 +507,6 @@ const AdminMedicines = () => {
 
   const handleImageChange = (e, index) => {
     const file = e.target.files[0];
-
     if (!file) return;
 
     const newImages = [...images];
@@ -466,7 +520,6 @@ const AdminMedicines = () => {
 
   const addImageSlot = () => {
     if (images.length >= 3) return;
-
     setImages((prev) => [...prev, null]);
     setPreview((prev) => [...prev, null]);
   };
@@ -486,24 +539,18 @@ const AdminMedicines = () => {
 
     try {
       const formData = new FormData();
-
       Object.keys(form).forEach((key) => {
         formData.append(key, form[key]);
       });
-
       images.forEach((img) => {
-        if (img) {
-          formData.append("images", img);
-        }
+        if (img) formData.append("images", img);
       });
 
       if (editing) {
         await api.put(`/medicines/update/${editing._id}`, formData);
-
         alert("Updated successfully");
       } else {
         await api.post("/medicines/create", formData);
-
         alert("Medicine added successfully");
       }
 
@@ -516,7 +563,6 @@ const AdminMedicines = () => {
 
   const handleEdit = (m) => {
     setEditing(m);
-
     setForm({
       name: m.name || "",
       type: m.type || "",
@@ -529,18 +575,14 @@ const AdminMedicines = () => {
       prescriptionRequired: m.prescriptionRequired || false,
       offer: m.offer || "",
     });
-
     setImages([null]);
     setPreview([null]);
-
     setShowModal(true);
   };
 
   const handleDelete = async (id) => {
     if (!window.confirm("Delete this medicine?")) return;
-
     await api.delete(`/medicines/delete/${id}`);
-
     fetchMedicines();
   };
 
@@ -548,7 +590,6 @@ const AdminMedicines = () => {
     <div>
       <div className="flex justify-between mb-5">
         <h1 className="text-2xl font-bold">Manage Medicines</h1>
-
         <button
           onClick={() => setShowModal(true)}
           className="bg-green-600 text-white px-4 py-2 rounded-lg"
@@ -587,7 +628,6 @@ const AdminMedicines = () => {
                     }}
                   />
                 )}
-
                 {m.offer ? (
                   <div className="absolute top-2 right-2 bg-orange-500 text-white text-xs px-2 py-0.5 rounded-full font-bold">
                     {m.offer}% OFF
@@ -603,19 +643,15 @@ const AdminMedicines = () => {
                     <span className="text-gray-400 line-through text-sm">
                       ₹{m.mrp}
                     </span>
-
                     <span className="text-green-600 font-bold">
                       ₹{discounted}
                     </span>
-
                     <span className="text-xs bg-orange-100 text-orange-600 px-2 py-0.5 rounded-full">
                       {m.offer}% OFF
                     </span>
                   </>
                 ) : (
-                  <span className="text-green-600 font-bold">
-                    ₹{m.mrp}
-                  </span>
+                  <span className="text-green-600 font-bold">₹{m.mrp}</span>
                 )}
               </div>
 
@@ -626,7 +662,6 @@ const AdminMedicines = () => {
                 >
                   Edit
                 </button>
-
                 <button
                   onClick={() => handleDelete(m._id)}
                   className="bg-red-500 text-white px-3 py-1 rounded"
@@ -661,21 +696,35 @@ const AdminMedicines = () => {
                 className="border p-2 w-full rounded"
               />
 
-              <input
+              {/* Type Dropdown */}
+              <select
                 name="type"
-                placeholder="Type"
                 value={form.type}
                 onChange={handleChange}
-                className="border p-2 w-full rounded"
-              />
+                className="border p-2 w-full rounded text-gray-700"
+              >
+                <option value="">Select Type</option>
+                {MEDICINE_TYPES.map((t) => (
+                  <option key={t} value={t}>
+                    {t}
+                  </option>
+                ))}
+              </select>
 
-              <input
+              {/* Category Dropdown */}
+              <select
                 name="category"
-                placeholder="Category"
                 value={form.category}
                 onChange={handleChange}
-                className="border p-2 w-full rounded"
-              />
+                className="border p-2 w-full rounded text-gray-700"
+              >
+                <option value="">Select Category</option>
+                {MEDICINE_CATEGORIES.map((c) => (
+                  <option key={c} value={c}>
+                    {c}
+                  </option>
+                ))}
+              </select>
 
               <input
                 name="brand"
@@ -694,7 +743,6 @@ const AdminMedicines = () => {
                   onChange={handleChange}
                   className="border p-2 rounded"
                 />
-
                 <input
                   name="offer"
                   type="number"
@@ -710,11 +758,9 @@ const AdminMedicines = () => {
                   <span className="line-through text-gray-400">
                     ₹{form.mrp}
                   </span>
-
                   <span className="text-green-600 font-bold">
                     ₹{discountedPrice}
                   </span>
-
                   <span className="text-orange-500 font-semibold">
                     {form.offer}% OFF
                   </span>
@@ -754,7 +800,6 @@ const AdminMedicines = () => {
                   checked={form.prescriptionRequired}
                   onChange={handleChange}
                 />
-
                 Prescription Required
               </label>
 
@@ -762,7 +807,6 @@ const AdminMedicines = () => {
                 <label className="text-sm font-semibold text-gray-700">
                   Images
                 </label>
-
                 {preview.map((src, index) => (
                   <div key={index} className="flex items-center gap-3">
                     <input
@@ -771,7 +815,6 @@ const AdminMedicines = () => {
                       onChange={(e) => handleImageChange(e, index)}
                       className="border p-2 w-full rounded text-sm"
                     />
-
                     {src && (
                       <img
                         src={src}
@@ -779,7 +822,6 @@ const AdminMedicines = () => {
                         className="w-12 h-12 object-cover rounded flex-shrink-0"
                       />
                     )}
-
                     <button
                       type="button"
                       onClick={() => removeImageSlot(index)}
@@ -789,7 +831,6 @@ const AdminMedicines = () => {
                     </button>
                   </div>
                 ))}
-
                 <button
                   type="button"
                   onClick={addImageSlot}
